@@ -49,17 +49,18 @@ import os
 
 
 try:
-    db2 = s.initializeDBC_Cantools('/strym/strym/dbc/toyota_rav4_hybrid.dbc')
+    db2 = s.initializeDBC_Cantools('../strym/strym/dbc/toyota_rav4_hybrid.dbc')
     print('Loaded DBC from: /strym/strym/dbc/toyota_rav4_hybrid.dbc')
 except:
     print('make sure to import and/or locate your dbc file')
 
-def setDBC(filePath):
+def setDBC(self,filePath):
     '''Initialize the DBC from strym, give the filepath to your dbc file.'''
+    global db2
     db2 = s.initializeDBC_Cantools(filePath)
 
 def search_files(directory='.', extension=''):
-    '''Search for files below directory that contain the extension.'''
+    '''Search for files below directory that contain the extension.With global.'''
     extension = extension.lower()
     matches = []
     for dirpath, dirnames, files in os.walk(directory):
@@ -140,12 +141,16 @@ class Detection():
               self.rv,'\nRel_Accel: ',self.a,'\nScore: ',self.score)
 
     def costij(self,v):
-        dist = 5*np.sqrt((self.x-v.x)**2+2*(self.y-v.y)**2)
-        rvdist = 1000*abs(self.rv-v.rv)**2
+        dist = 1*np.sqrt((self.x-v.x)**2+2*(self.y-v.y)**2)
+        rvdist = 100*abs(self.rv-v.rv)**2
 
         extra = 0
-        if abs(self.x-v.x) > 10:
-            extra = 1000*abs(self.x-v.x)
+        if abs(self.x-v.x) > 5:
+            extra += 1000*abs(self.x-v.x)
+        if abs(self.y-v.y) > 3:
+            extra += 1000*abs(self.y-v.y)
+        if abs(self.rv-v.rv) > 1:
+            extra += 1000*abs(self.rv-v.rv)
 
         return dist + rvdist + extra
 
@@ -213,14 +218,14 @@ class myGraph():
     #                     elif n >= v.id-1:
 
 #define a successive shortest path algorithm to extract the tracjectories
-def SSP(H, s='s', t='t'):
+def SSP(H, s='s', t='t', limit=40):
     """Successive shortest path algorithm using Bellman-Ford. Robust to negative weights. Graph H, and the source and target
     nodes of the flow network are needed as inputs. """
     J = H.copy()
 
-    ax1 = pt.subplot(121)
+    # ax1 = pt.subplot(121)
 #     pt.ylim([0,180])
-    ax2 = pt.subplot(122)
+    # ax2 = pt.subplot(122)
 #     pt.ylim([0,180])
 
     paths = []
@@ -233,7 +238,7 @@ def SSP(H, s='s', t='t'):
         path_cost = nx.shortest_path_length(J,s,t, weight='weight',method='bellman-ford')
         if path_cost < 0:
             path = nx.shortest_path(J,s,t, weight='weight',method='bellman-ford')
-            if len(path)< 40:
+            if len(path)< limit:
                 stop = True
     #         print('found!')
 

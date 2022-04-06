@@ -3,7 +3,7 @@
 
 # Author : Matthew Nice
 # Initial Date: Feb 21, 2021
-# About: trajectory analysis is for functions/methods/classes which are used to analyze the tracjectories compiled from the ITCAN algorithm.
+# About: trajectory analysis is for functions/methods/classes which are used to analyze the tracjectories compiled from the ITRAC algorithm.
 # Read associated README for full description
 # License: MIT License
 
